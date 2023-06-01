@@ -4,10 +4,10 @@ const client = require("./client")
 
 const {
   createUser,
-  getUser,
-  getUserById,
-  getUserByUsername  
-} = require("./users")
+  createActivity,
+  createRoutine,
+  addActivityToRoutine
+} = require("./");
 
 async function dropTables() {
   try {
