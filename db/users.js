@@ -36,7 +36,7 @@ async function getUser({ username, password }) {
 async function getUserById(userId) {
   try {
     const { rows: [ user ] } = await client.query(`
-      SELECT id, username, name, location, active
+      SELECT id 
       FROM users
       WHERE id=${ userId }
     `);
@@ -44,6 +44,10 @@ async function getUserById(userId) {
     if (!user) {
       return null
     }
+    const { password, ...userData } = user;
+
+    return userData;
+
   } catch (error) {
     throw error;
   }

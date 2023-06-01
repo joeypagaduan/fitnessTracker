@@ -1,11 +1,11 @@
 const client = require("./client");
 
-async function addActivityToRoutine({routineId, activityId, count, duration }) {
+async function addActivityToRoutine({ routineId, activityId, count, duration }) {
   try {
     const { rows: [routineActivity] } = await client.query(`
-    INSERT INTO routine_activities("routineId", "activityId", count, duration)
-      VALUES($1, $2, $3, $4)
-      RETURNING *;
+      INSERT INTO routine_activities("routineId", "activityId", count, duration)
+      VALUES ($1, $2, $3, $4)
+      RETURNING routineId, activityId, count, duration;
     `, [routineId, activityId, count, duration]);
 
     return routineActivity;
@@ -13,7 +13,6 @@ async function addActivityToRoutine({routineId, activityId, count, duration }) {
     throw error;
   }
 }
-
 
 async function getRoutineActivityById(id) {
   try {
@@ -26,14 +25,13 @@ async function getRoutineActivityById(id) {
   } catch (error) {
     throw error;
   }
-
 }
 
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
     const { rows: activities } = await client.query(`
-      SELECT * FROM activities
-      WHERE routineId = $1;
+      SELECT * FROM routine_activities
+      WHERE "routineId" = $1;
     `, [id]);
 
     return activities;
@@ -51,7 +49,7 @@ async function updateRoutineActivity({ id, ...fields }) {
 
     const query = `
       UPDATE routine_activities
-      SET ${updateParams.join(', ')}
+      SET ${updateParams.join(", ")}
       WHERE id = $1
       RETURNING *;
     `;
@@ -63,21 +61,25 @@ async function updateRoutineActivity({ id, ...fields }) {
   } catch (error) {
     throw error;
   }
-  
 }
 
 async function destroyRoutineActivity(id) {
   try {
-    await client.query(`
-      DELETE FROM activities
-      WHERE id = $1;
+    const { rows: [routineActivity] } = await client.query(`
+      DELETE FROM routine_activities
+      WHERE id = $1
+      RETURNING *;
     `, [id]);
+
+    return routineActivity;
   } catch (error) {
     throw error;
   }
 }
 
-async function canEditRoutineActivity(routineActivityId, userId) {}
+async function canEditRoutineActivity(routineActivityId, userId) {
+  
+}
 
 module.exports = {
   getRoutineActivityById,
