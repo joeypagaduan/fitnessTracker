@@ -2,12 +2,19 @@
 // const { } = require('./');
 const client = require("./client")
 
+const {
+  createUser,
+  getUser,
+  getUserById,
+  getUserByUsername  
+} = require("./users")
+
 async function dropTables() {
   try {
     console.log("Dropping All Tables...")
   // drop all tables, in the correct order
 
-    client.query(`
+    await client.query(`
       DROP TABLE IF EXISTS routine_activities;
       DROP TABLE IF EXISTS activities;
       DROP TABLE IF EXISTS routines;
