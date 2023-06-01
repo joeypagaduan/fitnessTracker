@@ -5,7 +5,7 @@ async function createActivity({ name, description }) {
   // return the new activity
   try {
     const { rows: [ activity] } = await client.query(`
-      INSERT INTO activity(name, description) 
+      INSERT INTO activities(name, description) 
       VALUES($1, $2) 
       RETURNING *;
     `, [name, description]);
@@ -19,7 +19,7 @@ async function getAllActivities() {
   // select and return an array of all activities
   try {
     const { rows: activities } = await client.query(`
-      SELECT * FROM activity;
+      SELECT * FROM activities;
     `);
 
     return activities;
@@ -31,7 +31,7 @@ async function getAllActivities() {
 async function getActivityById(id) {
   try {
     const { rows: [activity] } = await client.query(`
-      SELECT * FROM activity
+      SELECT * FROM activities
       WHERE id = $1;
     `, [id]);
 
@@ -44,7 +44,7 @@ async function getActivityById(id) {
 async function getActivityByName(name) {
   try {
     const { rows: [activity] } = await client.query(`
-      SELECT * FROM activity
+      SELECT * FROM activities
       WHERE name = $1;
     `, [name]);
 
@@ -59,7 +59,7 @@ async function attachActivitiesToRoutines(routines) {
   try {
     const routineIds = routines.map((routine) => routine.id);
     const { rows: routineActivities } = await client.query(`
-      SELECT * FROM routine_activity
+      SELECT * FROM routine_activit
       WHERE routineId = ANY($1);
     `, [routineIds]);
 
@@ -92,7 +92,7 @@ async function updateActivity({ id, ...fields }) {
     });
 
     const query = `
-      UPDATE activity
+      UPDATE activities
       SET ${updateParams.join(', ')}
       WHERE id = $1
       RETURNING *;
