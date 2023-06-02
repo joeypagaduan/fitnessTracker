@@ -45,8 +45,8 @@ async function getUserById(userId) {
     const { rows: [ user ] } = await client.query(`
       SELECT *
       FROM users
-      WHERE id=${ userId }
-    `);
+      WHERE username=$1
+    `, [userName]);
 
     delete user.password
 
