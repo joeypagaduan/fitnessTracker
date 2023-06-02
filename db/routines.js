@@ -3,7 +3,7 @@ const client = require("./client");
 async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
     const { rows: [ routine] } = await client.query(`
-      INSERT INTO routines( creatorId, isPublic, name, goal) 
+      INSERT INTO routines("creatorId", "isPublic", name, goal ) 
       VALUES($1, $2, $3, $4) 
       RETURNING *;
     `, [ creatorId, isPublic, name, goal]);
@@ -26,7 +26,23 @@ async function getRoutineById(id) {
   }
 };
 
-async function getRoutinesWithoutActivities() {}
+async function getRoutinesWithoutActivities() {
+  try {
+    const result = await client.query(`
+      SELECT * FROM routines
+      WHERE id NOT IN (
+        SELECT DISTINCT "routineId" 
+        FROM routine_activities
+      )
+    `);
+
+    const routines = result.rows;
+    return routines;
+  } catch (error) {
+    console.error('Error while getting routines without activities');
+    throw error;
+  }
+};
 
 async function getAllRoutines() {}
 
