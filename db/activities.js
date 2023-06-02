@@ -59,7 +59,7 @@ async function attachActivitiesToRoutines(routines) {
   try {
     const routineIds = routines.map((routine) => routine.id);
     const { rows: routineActivities } = await client.query(`
-      SELECT * FROM routine_activit
+      SELECT * FROM routine_activities
       WHERE routineId = ANY($1);
     `, [routineIds]);
 

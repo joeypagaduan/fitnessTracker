@@ -6,6 +6,8 @@ const {
   createUser,
   createActivity,
   createRoutine,
+  getRoutinesWithoutActivities,
+  getAllActivities,
   addActivityToRoutine
 } = require("./");
 
