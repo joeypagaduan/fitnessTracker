@@ -37,7 +37,7 @@ const {
 
 describe("/api/users", () => {
   describe("POST /api/users/register", () => {
-    xit("Creates a new user.", async () => {
+    it("Creates a new user.", async () => {
       // Create some fake user data
       const fakeUserData = {
         username: faker.internet.userName(),

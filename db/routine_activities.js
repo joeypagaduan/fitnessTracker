@@ -16,16 +16,18 @@ async function addActivityToRoutine({ routineId, activityId, count, duration }) 
 
 async function getRoutineActivityById(id) {
   try {
-    const { rows: [activity] } = await client.query(`
+    const { rows: [routineActivity] } = await client.query(`
       SELECT * FROM routine_activities
       WHERE id = $1;
     `, [id]);
 
-    return activity;
+    return routineActivity;
   } catch (error) {
     throw error;
   }
 }
+
+
 
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
@@ -78,7 +80,22 @@ async function destroyRoutineActivity(id) {
 }
 
 async function canEditRoutineActivity(routineActivityId, userId) {
-  
+  try {
+    const { rows: [routineActivity] } = await client.query(`
+      SELECT routines."creatorId" AS "creatorId"
+      FROM routine_activities
+      JOIN routines ON routines.id = routine_activities."routineId"
+      WHERE routine_activities.id = $1;
+    `, [routineActivityId]);
+
+    if (!routineActivity) {
+      throw new Error("Routine activity not found");
+    }
+
+    return routineActivity.creatorId === userId;
+  } catch (error) {
+    throw error;
+  }
 }
 
 module.exports = {
