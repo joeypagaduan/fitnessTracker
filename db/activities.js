@@ -60,7 +60,7 @@ async function attachActivitiesToRoutines(routines) {
     const routineIds = routines.map((routine) => routine.id);
     const { rows: routineActivities } = await client.query(`
       SELECT * FROM routine_activities
-      WHERE routineId = ANY($1);
+      WHERE "routineId" = ANY($1);
     `, [routineIds]);
 
     const routineActivitiesMap = {};
