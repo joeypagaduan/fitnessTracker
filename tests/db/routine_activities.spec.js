@@ -120,6 +120,11 @@ describe("DB Routine Activities", () => {
       const deletedRoutine = await destroyRoutineActivity(
         fakeRoutineActivity.id
       );
+
+      console.log("Deleted: ", deletedRoutine);
+      console.log("Fake: ", fakeRoutineActivity);
+      console.log("FRAid: ", fakeRoutineActivity.id)
+
       expect(deletedRoutine.id).toBe(fakeRoutineActivity.id);
       const { rows } = await client.query(`
           SELECT * FROM routine_activities

@@ -191,8 +191,6 @@ async function destroyRoutine(id) {
     , [id]);
 
     // Delete the routine
-    // still in progress
-    // Passed first test to delete routine from db, but failed to delete routine_activies
     const result = await client.query(
       `DELETE FROM routines
       WHERE id = $1;`
@@ -204,7 +202,7 @@ async function destroyRoutine(id) {
 
     console.log('Routine successfully deleted');
   } catch (error) {
-    console.error('Error while deleting routine');
+    console.error('Error while deleting routine', error);
     throw error;
   }
 ;}

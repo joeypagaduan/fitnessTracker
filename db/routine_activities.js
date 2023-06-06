@@ -42,6 +42,7 @@ async function getRoutineActivitiesByRoutine({ id }) {
 
     return activities;
   } catch (error) {
+    console.log("Error getting routine activities by routine: ", error);
     throw error;
   }
 }
@@ -78,28 +79,31 @@ async function destroyRoutineActivity(id) {
     `, [id]);
 
     return routineActivity;
+
   } catch (error) {
+    console.log("Error destroying routine activity: ", error);
     throw error;
   }
 }
 
 async function canEditRoutineActivity(routineActivityId, userId) {
-  try {
-    const { rows: [routineActivity] } = await client.query(`
-      SELECT routines."creatorId" AS "creatorId"
-      FROM routine_activities
-      JOIN routines ON routines.id = routine_activities."routineId"
-      WHERE routine_activities.id = $1;
-    `, [routineActivityId]);
+  
+try {
+  const { rows: [ activity ] } = await client.query(`
+    SELECT * 
+    FROM routine_activities
+    WHERE id =$1
+  `, [ userId ]);
 
-    if (!routineActivity) {
-      throw new Error("Routine activity not found");
-    }
+  return (activity && activity.id === userId) ? true : false;
 
-    return routineActivity.creatorId === userId;
-  } catch (error) {
-    throw error;
-  }
+} catch (error) {
+  console.log(error);
+  throw error;
+}
+
+
+
 }
 
 module.exports = {
