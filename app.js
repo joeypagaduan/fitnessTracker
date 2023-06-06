@@ -27,4 +27,14 @@ const apiRouter = require('./api');
 
 app.use("/api", apiRouter);
 
+app.use((req, res, next) => {
+    res.status(404).send("Page not found");
+});
+  
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).send(err);
+});
+  
+
 module.exports = app;
