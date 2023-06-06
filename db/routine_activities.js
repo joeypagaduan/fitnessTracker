@@ -16,13 +16,16 @@ async function addActivityToRoutine({ routineId, activityId, count, duration }) 
 
 async function getRoutineActivityById(id) {
   try {
-    const { rows: [routineActivity] } = await client.query(`
-      SELECT * FROM routine_activities
+    const { rows: routineActivity } = await client.query(`
+      SELECT *
+      FROM routine_activities
       WHERE id = $1;
     `, [id]);
+    // console.log("routineActivity: ", routineActivity);
 
     return routineActivity;
   } catch (error) {
+    console.log("Error getting routineActivity by ID: ", error);
     throw error;
   }
 }
