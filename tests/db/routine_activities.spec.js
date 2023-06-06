@@ -85,6 +85,9 @@ describe("DB Routine Activities", () => {
       const [routineActivity] = await getRoutineActivitiesByRoutine(
         fakeRoutine
       );
+      // console.log("RA: ", routineActivity)
+      // console.log("FRA: ", fakeRoutineActivity)
+
       expect(routineActivity.id).toEqual(fakeRoutineActivity.id);
     });
   });
