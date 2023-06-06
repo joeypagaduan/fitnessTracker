@@ -48,24 +48,42 @@ async function getRoutineActivitiesByRoutine({ id }) {
 }
 
 async function updateRoutineActivity({ id, ...fields }) {
+  const setString = Object.keys(fields).map(
+    (key, index) => `"${ key }"=$${ index + 1 }`
+  ).join(', ');
+
+  if (setString.length === 0) {
+    return;
+  };
+  
   try {
-    const fieldEntries = Object.entries(fields);
-    const updateParams = fieldEntries.map(([key, value], index) => {
-      return `${key} = $${index + 2}`;
-    });
+      const { rows: [routineActivity] } = await client.query(`
+        UPDATE routine_activities ra
+        SET ${setString}
+        WHERE id = $${Object.values(fields).length + 1}
+        RETURNING ra.id, ra.count, ra.duration;
+      `, [...Object.values(fields), id]);
 
-    const query = `
-      UPDATE routine_activities
-      SET ${updateParams.join(", ")}
-      WHERE id = $1
-      RETURNING *;
-    `;
-    const values = [id, ...fieldEntries.map(([, value]) => value)];
+      return routineActivity;
+  
+  // try {
+  //   const fieldEntries = Object.entries(fields);
+  //   const updateParams = fieldEntries.map(([key, value], index) => {
+  //     return `${key} = $${index + 2}`;
+  //   });
 
-    const { rows: [routineActivity] } = await client.query(query, values);
+  //   const query = `
+  //     UPDATE routine_activities
+  //     SET ${updateParams.join(", ")}
+  //     WHERE id = $1
+  //     RETURNING *;
+  //   `;
+  //   const values = [id, ...fieldEntries.map(([, value]) => value)];
 
-    return routineActivity;
+  //   const { rows: [routineActivity] } = await client.query(query, values);
+
   } catch (error) {
+    console.log("Error Updating Routine Activity: ", error);
     throw error;
   }
 }

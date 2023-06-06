@@ -104,7 +104,9 @@ describe("DB Routine Activities", () => {
       const updatedRoutineActivity = await updateRoutineActivity(
         newRoutineActivityData
       );
-
+        console.log("updatedRoutineActivity: ", updatedRoutineActivity);
+        console.log("newRoutineActivityData: ", newRoutineActivityData);
+        
       expect(updatedRoutineActivity.id).toBe(fakeRoutineActivity.id);
       expect(updatedRoutineActivity.count).toBe(newRoutineActivityData.count);
       expect(updatedRoutineActivity.duration).toBe(
