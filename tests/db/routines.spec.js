@@ -182,6 +182,8 @@ describe("DB Routines", () => {
       const activity = routine.activities.find(
         (activity) => activity.id === fakeActivity.id
       );
+      // console.log("fake: ", fakeRoutineActivity);
+      // console.log("TEST: ", activity);
       expect(activity.routineId).toEqual(fakeRoutine.id);
       expect(activity.routineActivityId).toEqual(fakeRoutineActivity.id);
     });

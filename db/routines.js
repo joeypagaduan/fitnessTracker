@@ -54,11 +54,11 @@ async function getAllRoutines() {
       SELECT r.*, u.username AS "creatorName"
       FROM routines r
       JOIN users u
-      ON r."creatorId" = u.id
+        ON r."creatorId" = u.id;
     `);
 
     const allRoutines = await attachActivitiesToRoutines(routines);
-
+    // console.log(allRoutines);
     return allRoutines;
 
   } catch (error) {
