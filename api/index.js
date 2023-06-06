@@ -3,6 +3,11 @@ const router = express.Router();
 
 // GET /api/health
 router.get('/health', async (req, res, next) => {
+    try {
+        res.send({ status: 'ok' });
+      } catch (error) {
+        next(error);
+      }
 });
 
 // ROUTER: /api/users
