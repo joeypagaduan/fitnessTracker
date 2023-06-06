@@ -165,17 +165,17 @@ async function updateRoutine({ id, ...fields }) {}
 async function destroyRoutine(id) {
   try {
     await client.query(
-      'DELETE FROM routine_activities WHERE id = $1',
-      [id]
-    );
+      `DELETE FROM routine_activities
+      WHERE "routineId" = $1;`
+    , [id]);
 
     // Delete the routine
     // still in progress
     // Passed first test to delete routine from db, but failed to delete routine_activies
     const result = await client.query(
-      'DELETE FROM routines WHERE id = $1 RETURNING *',
-      [id]
-    );
+      `DELETE FROM routines
+      WHERE id = $1;`
+    , [id]);
 
     if (result.rowCount === 0) {
       throw new Error('Routine not found');
