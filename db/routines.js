@@ -50,10 +50,10 @@ async function getRoutinesWithoutActivities() {
 
 async function getAllRoutines() {
   try {
-    const { rows:routines } = await client.query(`
+    const { rows: routines } = await client.query(`
       SELECT r.*, u.username AS "creatorName"
       FROM routines r
-      INNER JOIN users u
+      JOIN users u
       ON r."creatorId" = u.id
     `);
 
@@ -61,9 +61,8 @@ async function getAllRoutines() {
 
     return allRoutines;
 
-    return rows;
   } catch (error) {
-    console.error('Error while getting all routines');
+    console.error('Error while getting all routines: ', error);
     throw error;
   }
 };

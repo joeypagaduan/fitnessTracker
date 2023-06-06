@@ -57,22 +57,17 @@ async function getActivityByName(name) {
 // used as a helper inside db/routines.js
 async function attachActivitiesToRoutines(routines) {
   try {
-    const routineIds = routines.map((routine) => routine.id);
-    const { rows: routineActivities } = await client.query(`
-      SELECT * FROM routine_activities
-      WHERE "routineId" = ANY($1);
-    `, [routineIds]);
-
-    const routineActivitiesMap = {};
-    for (const routineActivity of routineActivities) {
-      if (!routineActivitiesMap[routineActivity.routineId]) {
-        routineActivitiesMap[routineActivity.routineId] = [];
-      }
-      routineActivitiesMap[routineActivity.routineId].push(routineActivity);
-    }
+    const { rows: activities } = await client.query(`
+      SELECT a.*, ra.duration, ra.count, ra."routineId", ra.id AS "routineActivityId"
+      FROM activities a
+      JOIN routine_activities ra 
+      ON ra."activityId" = a.id
+      WHERE ra."routineId" 
+      IN (${routines.map(routine => routine.id).join(', ')});
+    `);
 
     for (const routine of routines) {
-      routine.activities = routineActivitiesMap[routine.id] || [];
+      routine.activities = activities.filter(activity => activity.routineId === routine.id);
     }
 
     return routines;
