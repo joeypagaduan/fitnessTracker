@@ -1,4 +1,5 @@
 const client = require("./client");
+const { getRoutinesWithoutActivities } = require("./routines");
 
 async function addActivityToRoutine({ routineId, activityId, count, duration }) {
   try {
@@ -94,15 +95,20 @@ async function destroyRoutineActivity(id) {
 async function canEditRoutineActivity(routineActivityId, userId) {
   
 try {
-  const { rows: [ activity ] } = await client.query(`
+  const { rows: [ routineActivity ] } = await client.query(`
     SELECT * 
-    FROM routine_activities
-    WHERE id =$1
-  `, [ userId ]);
+    FROM routine_activities ra
+    JOIN routines r
+    ON r.id = ra."routineId"
+    WHERE ra.id =$1;
+  `, [ routineActivityId ]);
 //join routine and reference "creatorId"
 
-  return (activity && activity.id === userId) ? true : false;
-
+  if (routineActivity.creatorId === userId) {
+    return true;
+  } else {
+    return false;
+  }
 } catch (error) {
   console.log(error);
   throw error;
