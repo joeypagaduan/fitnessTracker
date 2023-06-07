@@ -64,9 +64,9 @@ async function updateRoutineActivity({ id, ...fields }) {
         WHERE id = $${Object.values(fields).length + 1}
         RETURNING *;
       `, [...Object.values(fields), id]);
-      console.log("string: ", setString);
-      console.log("Id: ", id);
-      console.log("RA: ", routineActivity);
+      // console.log("string: ", setString);
+      // console.log("Id: ", id);
+      // console.log("RA: ", routineActivity);
 
       return routineActivity;
   

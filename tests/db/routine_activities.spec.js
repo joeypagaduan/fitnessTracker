@@ -104,8 +104,8 @@ describe("DB Routine Activities", () => {
       const updatedRoutineActivity = await updateRoutineActivity(
         newRoutineActivityData
       );
-        console.log("updatedRoutineActivity: ", updatedRoutineActivity);
-        console.log("newRoutineActivityData: ", newRoutineActivityData);
+        // console.log("updatedRoutineActivity: ", updatedRoutineActivity);
+        // console.log("newRoutineActivityData: ", newRoutineActivityData);
         
       expect(updatedRoutineActivity.id).toBe(fakeRoutineActivity.id);
       expect(updatedRoutineActivity.count).toBe(newRoutineActivityData.count);
@@ -123,9 +123,9 @@ describe("DB Routine Activities", () => {
         fakeRoutineActivity.id
       );
 
-      console.log("Deleted: ", deletedRoutine);
-      console.log("Fake: ", fakeRoutineActivity);
-      console.log("FRAid: ", fakeRoutineActivity.id)
+      // console.log("Deleted: ", deletedRoutine);
+      // console.log("Fake: ", fakeRoutineActivity);
+      // console.log("FRAid: ", fakeRoutineActivity.id)
 
       expect(deletedRoutine.id).toBe(fakeRoutineActivity.id);
       const { rows } = await client.query(`
