@@ -61,11 +61,11 @@ async function getAllRoutines() {
     `);
 
     const allRoutines = await attachActivitiesToRoutines(routines);
-
+    // console.log(allRoutines);
     return allRoutines;
 
   } catch (error) {
-    console.error('Error while getting all routines');
+    console.error('Error while getting all routines: ', error);
     throw error;
   }
 };
