@@ -29,6 +29,24 @@ router.get("/", async (req, res, next) => {
 });
 
 // POST /api/routines
+router.post("/", requireUser, async (req, res, next) => {
+    const { isPublic, name, goal } = req.body;
+    const creatorId = req.user.id;
+  
+    try {
+        const newRoutine = await createRoutine({
+            creatorId,
+            isPublic,
+            name,
+            goal,
+        });
+  
+        res.send(newRoutine);
+
+    } catch ({ name, message }) {
+        next({ name, message });
+    }
+});
 
 // PATCH /api/routines/:routineId
 

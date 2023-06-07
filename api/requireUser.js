@@ -1,13 +1,12 @@
 const requireUser = (req, res, next) => {
     if (!req.user) {
         next({
-            name: "Authorization Error",
-            message: "You must be logged in to perform this action",
+            name: "MissingUserError",
+            message: "You must be logged in to perform this action"
         });
-    } else {
-      console.log("Authorized");
-      return next();
-    }
-  };
+    } 
+    
+    next();
+}
   
   module.exports = { requireUser };

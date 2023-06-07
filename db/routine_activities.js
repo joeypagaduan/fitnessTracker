@@ -5,7 +5,7 @@ async function addActivityToRoutine({ routineId, activityId, count, duration }) 
     const { rows: [routineActivity] } = await client.query(`
       INSERT INTO routine_activities("routineId", "activityId", count, duration)
       VALUES ($1, $2, $3, $4)
-      RETURNING "routineId", "activityId", count, duration;
+      RETURNING *;
     `, [routineId, activityId, count, duration]);
 
     return routineActivity;
@@ -16,7 +16,7 @@ async function addActivityToRoutine({ routineId, activityId, count, duration }) 
 
 async function getRoutineActivityById(id) {
   try {
-    const { rows: routineActivity } = await client.query(`
+    const { rows: [routineActivity] } = await client.query(`
       SELECT *
       FROM routine_activities
       WHERE id = $1;
@@ -35,7 +35,7 @@ async function getRoutineActivityById(id) {
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
     const { rows: activities } = await client.query(`
-      SELECT ra."routineId", ra."activityId", ra.count, ra.duration
+      SELECT *
       FROM routine_activities ra
       WHERE "routineId" = ${id};
     `);
@@ -58,30 +58,17 @@ async function updateRoutineActivity({ id, ...fields }) {
   
   try {
       const { rows: [routineActivity] } = await client.query(`
-        UPDATE routine_activities ra
+        UPDATE routine_activities
         SET ${setString}
         WHERE id = $${Object.values(fields).length + 1}
-        RETURNING ra.id, ra.count, ra.duration;
+        RETURNING *;
       `, [...Object.values(fields), id]);
+      console.log("string: ", setString);
+      console.log("Id: ", id);
+      console.log("RA: ", routineActivity);
 
       return routineActivity;
   
-  // try {
-  //   const fieldEntries = Object.entries(fields);
-  //   const updateParams = fieldEntries.map(([key, value], index) => {
-  //     return `${key} = $${index + 2}`;
-  //   });
-
-  //   const query = `
-  //     UPDATE routine_activities
-  //     SET ${updateParams.join(", ")}
-  //     WHERE id = $1
-  //     RETURNING *;
-  //   `;
-  //   const values = [id, ...fieldEntries.map(([, value]) => value)];
-
-  //   const { rows: [routineActivity] } = await client.query(query, values);
-
   } catch (error) {
     console.log("Error Updating Routine Activity: ", error);
     throw error;
@@ -112,6 +99,7 @@ try {
     FROM routine_activities
     WHERE id =$1
   `, [ userId ]);
+//join routine and reference "creatorId"
 
   return (activity && activity.id === userId) ? true : false;
 
