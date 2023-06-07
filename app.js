@@ -13,9 +13,7 @@ app.use(morgan('dev'));
 const apiRouter = require('./api');
 
 // Have the server use your API router with prefix '/api'
-app.use('/api', apiRouter);
 
-
-
+app.use("/api", apiRouter);
 
 module.exports = app;
