@@ -1,8 +1,8 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
-
+// const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const {JWT_SECRET } = process.env;
 
 const { createUser,
   getUser,
@@ -15,17 +15,17 @@ const router = express.Router();
 router.post("/register", async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    console.log("error")
+   
 
     // Check if the username is already taken
     const existingUser = await getUserByUsername(username);
     if (existingUser) {
-      console.log("error")
       return next({
         error: "UserTakenError",
         message: "A user with that username already exists",
       });
     }
+    console.log("eroor to get")
 
     // Check if the password is at least 8 characters long
     if (password.length < 8) {
@@ -33,19 +33,16 @@ router.post("/register", async (req, res, next) => {
       return next({
         error: "PasswordTooShortError",
         message: "Password should be at least 8 characters long",
-
       });
     }
     console.log("error")
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    
     // Create a new user account
-    const newUser = await createUser(username, hashedPassword);
+    const newUser = await createUser({username, password});
 
     // Generate a JSON Web Token (JWT) for authentication
-    const token = generateToken(newUser.id, newUser.username);
+    const token = jwt.sign({id: newUser.id, username: newUser.username},JWT_SECRET);
 
     // Return the response
     res.send({
