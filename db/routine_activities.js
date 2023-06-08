@@ -1,11 +1,12 @@
 const client = require("./client");
+const { getRoutinesWithoutActivities } = require("./routines");
 
 async function addActivityToRoutine({ routineId, activityId, count, duration }) {
   try {
     const { rows: [routineActivity] } = await client.query(`
       INSERT INTO routine_activities("routineId", "activityId", count, duration)
       VALUES ($1, $2, $3, $4)
-      RETURNING "routineId", "activityId", count, duration;
+      RETURNING *;
     `, [routineId, activityId, count, duration]);
 
     return routineActivity;
@@ -16,8 +17,8 @@ async function addActivityToRoutine({ routineId, activityId, count, duration }) 
 
 async function getRoutineActivityById(id) {
   try {
-    const { rows: routineActivity } = await client.query(`
-      SELECT "routineId", "activityId", count, duration
+    const { rows: [routineActivity] } = await client.query(`
+      SELECT *
       FROM routine_activities
       WHERE id = $1;
     `, [id]);
@@ -31,11 +32,10 @@ async function getRoutineActivityById(id) {
 }
 
 
-
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
     const { rows: activities } = await client.query(`
-      SELECT "routineId", "activityId", count, duration
+      SELECT *
       FROM routine_activities ra
       WHERE "routineId" = ${id};
     `);
@@ -57,36 +57,17 @@ async function updateRoutineActivity({ id, ...fields }) {
   }
   
   try {
-    const { rows: [routineActivity] } = await client.query(`
-      UPDATE routine_activities ra
-      SET ${setString}
-      WHERE id = $${Object.keys(fields).length + 1}
-      RETURNING *;
-    `, [...Object.values(fields), id]);
-
-    return routineActivity;
+      const { rows: [routineActivity] } = await client.query(`
+        UPDATE routine_activities
+        SET ${setString}
+        WHERE id = $${Object.values(fields).length + 1}
+        RETURNING *;
+      `, [...Object.values(fields), id]);
+      // console.log("string: ", setString);
+      // console.log("Id: ", id);
+      // console.log("RA: ", routineActivity);
 
   
-  // try {
-  //   const fieldKeys = Object.keys(fields);
-  //   const fieldValues = Object.values(fields);
-    
-  //   const updateParams = fieldKeys.map((key, index) => `${key} = $${index + 2}`);
-    
-  //   const query = `
-  //     UPDATE routine_activities
-  //     SET ${updateParams.join(", ")}
-  //     WHERE id = $1
-  //     RETURNING *;
-  //   `;
-    
-  //   const values = [id, ...fieldValues];
-    
-  //   const result = await client.query(query, values);
-    
-  //   const [routineActivity] = result.rows;
-    
-  //   return routineActivity;
   } catch (error) {
     console.error("Error updating routine activity:", error);
     throw error;
@@ -113,21 +94,25 @@ async function destroyRoutineActivity(id) {
 
 async function canEditRoutineActivity(routineActivityId, userId) {
   
-try {
-  const { rows: [ activity ] } = await client.query(`
-    SELECT * 
-    FROM routine_activities
-    WHERE id =$1
-  `, [ userId ]);
+  try {
+    const { rows: [ routineActivity ] } = await client.query(`
+      SELECT * 
+      FROM routine_activities ra
+      JOIN routines r
+      ON r.id = ra."routineId"
+      WHERE ra.id =$1;
+    `, [ routineActivityId ]);
+  //join routine and reference "creatorId"
 
-  return (activity && activity.id === userId) ? true : false;
-
-} catch (error) {
-  console.log(error);
-  throw error;
-}
-
-
+    if (routineActivity.creatorId === userId) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 
 }
 
