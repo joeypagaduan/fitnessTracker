@@ -6,7 +6,12 @@ const requireUser = (req, res, next) => {
         });
     } 
     
+    req.user = {
+        username: req.user.username,
+        id: req.user.id,
+    };
+
     next();
 }
   
-  module.exports = { requireUser };
+  module.exports = { requireUser }
