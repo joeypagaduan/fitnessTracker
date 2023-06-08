@@ -32,6 +32,7 @@ async function getRoutineActivityById(id) {
 }
 
 
+
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
     const { rows: activities } = await client.query(`
@@ -57,15 +58,14 @@ async function updateRoutineActivity({ id, ...fields }) {
   }
   
   try {
-      const { rows: [routineActivity] } = await client.query(`
-        UPDATE routine_activities
-        SET ${setString}
-        WHERE id = $${Object.values(fields).length + 1}
-        RETURNING *;
-      `, [...Object.values(fields), id]);
-      // console.log("string: ", setString);
-      // console.log("Id: ", id);
-      // console.log("RA: ", routineActivity);
+    const { rows: [routineActivity] } = await client.query(`
+      UPDATE routine_activities ra
+      SET ${setString}
+      WHERE id = $${Object.keys(fields).length + 1}
+      RETURNING *;
+    `, [...Object.values(fields), id]);
+
+    return routineActivity;
 
   
   } catch (error) {
@@ -94,25 +94,27 @@ async function destroyRoutineActivity(id) {
 
 async function canEditRoutineActivity(routineActivityId, userId) {
   
-  try {
-    const { rows: [ routineActivity ] } = await client.query(`
-      SELECT * 
-      FROM routine_activities ra
-      JOIN routines r
-      ON r.id = ra."routineId"
-      WHERE ra.id =$1;
-    `, [ routineActivityId ]);
-  //join routine and reference "creatorId"
+try {
+  const { rows: [ routineActivity ] } = await client.query(`
+    SELECT * 
+    FROM routine_activities ra
+    JOIN routines r
+    ON r.id = ra."routineId"
+    WHERE ra.id =$1;
+  `, [ routineActivityId ]);
+//join routine and reference "creatorId"
 
-    if (routineActivity.creatorId === userId) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (error) {
-    console.log(error);
-    throw error;
+  if (routineActivity.creatorId === userId) {
+    return true;
+  } else {
+    return false;
   }
+} catch (error) {
+  console.log(error);
+  throw error;
+}
+
+
 
 }
 
