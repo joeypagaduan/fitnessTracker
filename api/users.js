@@ -10,6 +10,7 @@ const { createUser,
   getUserByUsername} = require("../db/users");
 
   const{
+    getAllRoutinesByUser,
     getPublicRoutinesByUser
   } = require("../db/routines")
 
@@ -88,6 +89,8 @@ router.post("/login", async (req, res, next) => {
       });
     }
 
+    const token = jwt.sign({ id: user.id, username: user.username}, process.env.JWT_SECRET);
+
     // Return the response
     res.send({
       message: "you're logged in!",
@@ -108,6 +111,13 @@ router.get("/me", async (req, res, next) => {
     // Get the current user based on the authentication token
     const currentUser = req.user;
 
+    if (!currentUser) {
+      return next({ 
+        error: "error",
+        message: "You must be logged in to perform this action",
+        name:"undefined", });
+    }
+
     res.send({
       id: currentUser.id,
       username: currentUser.username,
@@ -123,9 +133,14 @@ router.get("/:username/routines", async (req, res, next) => {
     const { username } = req.params;
 
   
-    const routines = await getPublicRoutinesByUser({username});
+    const publicroutines = await getPublicRoutinesByUser({username});
+    const allroutines = await getAllRoutinesByUser({username});
 
-    res.send(routines);
+  
+    // res.send({ publicroutines, allroutines });
+    // can not send multiple request? 
+    res.send(publicroutines)
+    
 
   } catch (error) {
     next(error);

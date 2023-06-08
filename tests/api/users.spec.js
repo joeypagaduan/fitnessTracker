@@ -156,7 +156,7 @@ describe("/api/users", () => {
       );
     });
 
-    xit("Logs in the user and returns the user back to us", async () => {
+    it("Logs in the user and returns the user back to us", async () => {
       // Create some fake user data
       const userData = {
         username: faker.internet.userName(),
@@ -177,7 +177,7 @@ describe("/api/users", () => {
       });
     });
 
-    xit("Returns a JSON Web Token. Stores the id and username in the token.", async () => {
+    it("Returns a JSON Web Token. Stores the id and username in the token.", async () => {
       const userData = {
         username: faker.internet.userName(),
         password: faker.internet.password(),
@@ -214,7 +214,7 @@ describe("/api/users", () => {
       expect(response.body).toEqual(objectContaining(fakeUser));
     });
 
-    xit("rejects requests with no valid token", async () => {
+    it("rejects requests with no valid token", async () => {
       const response = await request(app).get("/api/users/me");
 
       expect(response.status).toBe(401);
@@ -244,7 +244,7 @@ describe("/api/users", () => {
       expect(response.body).toEqual([...routinesFromDB]);
     });
 
-    xit("gets a list of all routines for the logged in user", async () => {
+    it("gets a list of all routines for the logged in user", async () => {
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(
         "Angela"
       );

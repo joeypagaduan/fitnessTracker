@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require("jsonwebtoken");
+const {JWT_SECRET } = process.env;
 
 const {
     getAllPublicRoutines,
@@ -43,8 +45,8 @@ router.post("/", requireUser, async (req, res, next) => {
   
         res.send(newRoutine);
 
-    } catch ({ name, message }) {
-        next({ name, message });
+    } catch ({ name,message}) {
+        next({ name,message });
     }
 });
 
