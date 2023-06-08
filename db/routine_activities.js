@@ -32,7 +32,6 @@ async function getRoutineActivityById(id) {
 }
 
 
-
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
     const { rows: activities } = await client.query(`
@@ -50,12 +49,12 @@ async function getRoutineActivitiesByRoutine({ id }) {
 
 async function updateRoutineActivity({ id, ...fields }) {
   const setString = Object.keys(fields).map(
-    (key, index) => `"${ key }"=$${ index + 1 }`
+    (key, index) => `"${key}"=$${index + 1}`
   ).join(', ');
 
   if (setString.length === 0) {
     return;
-  };
+  }
   
   try {
       const { rows: [routineActivity] } = await client.query(`
@@ -68,53 +67,52 @@ async function updateRoutineActivity({ id, ...fields }) {
       // console.log("Id: ", id);
       // console.log("RA: ", routineActivity);
 
-      return routineActivity;
   
   } catch (error) {
-    console.log("Error Updating Routine Activity: ", error);
+    console.error("Error updating routine activity:", error);
     throw error;
   }
 }
 
 async function destroyRoutineActivity(id) {
   try {
-    const { rows: [routineActivity] } = await client.query(`
+    const query = `
       DELETE FROM routine_activities
       WHERE id = $1
       RETURNING *;
-    `, [id]);
+    `;
+    const values = [id];
+
+    const { rows: [routineActivity] } = await client.query(query, values);
 
     return routineActivity;
-
   } catch (error) {
-    console.log("Error destroying routine activity: ", error);
+    console.error("Error destroying routine activity:", error);
     throw error;
   }
 }
 
 async function canEditRoutineActivity(routineActivityId, userId) {
   
-try {
-  const { rows: [ routineActivity ] } = await client.query(`
-    SELECT * 
-    FROM routine_activities ra
-    JOIN routines r
-    ON r.id = ra."routineId"
-    WHERE ra.id =$1;
-  `, [ routineActivityId ]);
-//join routine and reference "creatorId"
+  try {
+    const { rows: [ routineActivity ] } = await client.query(`
+      SELECT * 
+      FROM routine_activities ra
+      JOIN routines r
+      ON r.id = ra."routineId"
+      WHERE ra.id =$1;
+    `, [ routineActivityId ]);
+  //join routine and reference "creatorId"
 
-  if (routineActivity.creatorId === userId) {
-    return true;
-  } else {
-    return false;
+    if (routineActivity.creatorId === userId) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
-} catch (error) {
-  console.log(error);
-  throw error;
-}
-
-
 
 }
 

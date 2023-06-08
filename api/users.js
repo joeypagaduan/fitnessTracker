@@ -1,13 +1,18 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
-
+const jwt = require("jsonwebtoken");
+const {JWT_SECRET } = process.env;
 
 const { createUser,
   getUser,
   getUserById,
   getUserByUsername} = require("../db/users");
+
+  const{
+    getAllRoutinesByUser,
+    getPublicRoutinesByUser
+  } = require("../db/routines")
 
 const router = express.Router();
 
@@ -15,37 +20,35 @@ const router = express.Router();
 router.post("/register", async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    console.log("error")
+   
 
     // Check if the username is already taken
     const existingUser = await getUserByUsername(username);
     if (existingUser) {
-      console.log("error")
       return next({
         error: "UserTakenError",
-        message: "A user with that username already exists",
+        message: "User " + username + " is already taken.",
+        name: username,
       });
     }
+    
 
     // Check if the password is at least 8 characters long
     if (password.length < 8) {
-      console.log("error")
       return next({
         error: "PasswordTooShortError",
-        message: "Password should be at least 8 characters long",
-
+        message: "Password Too Short!",
+        name: username,
       });
+
     }
-    console.log("error")
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    
     // Create a new user account
-    const newUser = await createUser(username, hashedPassword);
+    const newUser = await createUser({username, password});
 
     // Generate a JSON Web Token (JWT) for authentication
-    const token = generateToken(newUser.id, newUser.username);
+    const token = jwt.sign({id: newUser.id, username: newUser.username},JWT_SECRET);
 
     // Return the response
     res.send({
@@ -57,7 +60,6 @@ router.post("/register", async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.log("error")
     next(error);
   }
 });
@@ -73,7 +75,6 @@ router.post("/login", async (req, res, next) => {
     if (!user) {
       // If the user doesn't exist, send an appropriate error response
       return next({
-        name: "InvalidCredentialsError",
         message: "Invalid username",
       });
     }
@@ -84,17 +85,15 @@ router.post("/login", async (req, res, next) => {
     if (!isPasswordMatch) {
       // If the password doesn't match, send an appropriate error response
       return next({
-        name: "InvalidCredentialsError",
         message: "Invalid password",
       });
     }
 
-    // Generate a JSON Web Token (JWT) for authentication
-    const token = generateToken(user.id, user.username);
+    const token = jwt.sign({ id: user.id, username: user.username}, process.env.JWT_SECRET);
 
     // Return the response
     res.send({
-      message: "You're logged in!",
+      message: "you're logged in!",
       token,
       user: {
         id: user.id,
@@ -112,6 +111,13 @@ router.get("/me", async (req, res, next) => {
     // Get the current user based on the authentication token
     const currentUser = req.user;
 
+    if (!currentUser) {
+      return next({ 
+        error: "error",
+        message: "You must be logged in to perform this action",
+        name:"undefined", });
+    }
+
     res.send({
       id: currentUser.id,
       username: currentUser.username,
@@ -126,12 +132,16 @@ router.get("/:username/routines", async (req, res, next) => {
   try {
     const { username } = req.params;
 
-    // Get the user's routines based on the username
-    const userRoutines = await getRoutinesByUsername(username);
+  
+    const publicroutines = await getPublicRoutinesByUser({username});
+    const allroutines = await getAllRoutinesByUser({username});
 
-    res.send({
-      routines: userRoutines,
-    });
+  
+    // res.send({ publicroutines, allroutines });
+    // can not send multiple request? 
+    res.send(publicroutines)
+    
+
   } catch (error) {
     next(error);
   }

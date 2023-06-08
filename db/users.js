@@ -1,6 +1,7 @@
 const client = require("./client");
 const bcrypt = require("bcrypt");
 
+
 // database functions
 
 // user functions
@@ -69,6 +70,8 @@ async function getUserByUsername(username) {
       FROM users
       WHERE username=$1;
     `, [username]);
+
+console.log(username)
 
     return user;
   } catch (error) {
