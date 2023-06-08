@@ -5,18 +5,24 @@ const {JWT_SECRET } = process.env;
 const{
     getRoutineActivityById, 
     updateRoutineActivity,
+    destroyRoutineActivity,
+} = require("../db/routine_activities");
 
-} = require("../db/routine_activities")
+const { getRoutineById } = require("../db/routines");
+
+const { requireUser } = require("./requireUser");
 
 
 
 // PATCH /api/routine_activities/:routineActivityId
 
-router.patch('/:routineActivityId', async (req, res, next) => {
+router.patch('/:routineActivityId', requireUser, async (req, res, next) => {
     try {
       const { routineActivityId } = req.params;
+      const { routineId } = req.params;
       const { count, duration } = req.body;
-      
+
+      const routine = await getRoutineById(routineId);    
   
     const existingRoutineActivity = await getRoutineActivityById(routineActivityId);
    
@@ -28,7 +34,7 @@ console.log(existingRoutineActivity.name)
          if (existingRoutineActivity.creatorId !== req.user.id) {
       return next({
         error: "UnauthorizedError",
-        message: `User ${req.user.username} is not allowed to update`,
+        message: `User ${req.user.username} is not allowed to update ${routine.name}`,
         name: "UnauthorizedError",
       });
     }
@@ -58,7 +64,7 @@ console.log(existingRoutineActivity.name)
       }
     
       // Delete the routine activity
-      await deleteRoutineActivity(routineActivityId);
+      await destroyRoutineActivity(routineActivityId);
     
       res.sendStatus(204);
     } catch (error) {
