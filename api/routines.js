@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require("jsonwebtoken");
-const {JWT_SECRET } = process.env;
 
 const {
     getAllPublicRoutines,
@@ -42,16 +40,45 @@ router.post("/", requireUser, async (req, res, next) => {
             name,
             goal,
         });
-  
+
+        // console.log("creatorId", creatorId);
+        // console.log("newRoutine: ", newRoutine);
+
         res.send(newRoutine);
 
-    } catch ({ name,message}) {
-        next({ name,message });
+    } catch ({ name, message }) {
+        next ({ name, message });
     }
 });
 
 // PATCH /api/routines/:routineId
-
+router.patch("/:routineId", requireUser, async (req, res, next) => {
+    const { routineId } = req.params;
+    const { name, goal, isPublic } = req.body;
+    
+    const routine = await getRoutineById(routineId);
+    
+    try {
+        if (req.user.id !== routine.creatorId) {
+            res.status(403).send({
+                error: "Forbidden",
+                message: `User ${req.user.username} is not allowed to update ${routine.name}`,
+                name: "Forbidden",
+            });
+        }
+        if (req.user.id === routine.creatorId) {
+            const updatedRoutine = await updateRoutine({
+                id: routineId,
+                name,
+                goal,
+                isPublic,
+            });
+        res.send(updatedRoutine);
+        }
+    } catch (error) {
+      next(error);
+    }
+});
 // DELETE /api/routines/:routineId
 
 // POST /api/routines/:routineId/activities
