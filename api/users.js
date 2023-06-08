@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {JWT_SECRET } = process.env;
 
@@ -8,6 +8,10 @@ const { createUser,
   getUser,
   getUserById,
   getUserByUsername} = require("../db/users");
+
+  const{
+    getPublicRoutinesByUser
+  } = require("../db/routines")
 
 const router = express.Router();
 
@@ -22,20 +26,21 @@ router.post("/register", async (req, res, next) => {
     if (existingUser) {
       return next({
         error: "UserTakenError",
-        message: "A user with that username already exists",
+        message: "User " + username + " is already taken.",
+        name: username,
       });
     }
-    console.log("eroor to get")
+    
 
     // Check if the password is at least 8 characters long
     if (password.length < 8) {
-      console.log("error")
       return next({
         error: "PasswordTooShortError",
-        message: "Password should be at least 8 characters long",
+        message: "Password Too Short!",
+        name: username,
       });
+
     }
-    console.log("error")
 
     
     // Create a new user account
@@ -54,7 +59,6 @@ router.post("/register", async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.log("error")
     next(error);
   }
 });
@@ -70,7 +74,6 @@ router.post("/login", async (req, res, next) => {
     if (!user) {
       // If the user doesn't exist, send an appropriate error response
       return next({
-        name: "InvalidCredentialsError",
         message: "Invalid username",
       });
     }
@@ -81,17 +84,13 @@ router.post("/login", async (req, res, next) => {
     if (!isPasswordMatch) {
       // If the password doesn't match, send an appropriate error response
       return next({
-        name: "InvalidCredentialsError",
         message: "Invalid password",
       });
     }
 
-    // Generate a JSON Web Token (JWT) for authentication
-    const token = generateToken(user.id, user.username);
-
     // Return the response
     res.send({
-      message: "You're logged in!",
+      message: "you're logged in!",
       token,
       user: {
         id: user.id,
@@ -123,12 +122,11 @@ router.get("/:username/routines", async (req, res, next) => {
   try {
     const { username } = req.params;
 
-    // Get the user's routines based on the username
-    const userRoutines = await getRoutinesByUsername(username);
+  
+    const routines = await getPublicRoutinesByUser({username});
 
-    res.send({
-      routines: userRoutines,
-    });
+    res.send(routines);
+
   } catch (error) {
     next(error);
   }
