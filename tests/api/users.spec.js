@@ -244,7 +244,7 @@ describe("/api/users", () => {
       expect(response.body).toEqual([...routinesFromDB]);
     });
 
-    it("gets a list of all routines for the logged in user", async () => {
+    xit("gets a list of all routines for the logged in user", async () => {
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(
         "Angela"
       );

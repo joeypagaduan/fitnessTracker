@@ -39,11 +39,11 @@ router.use(async (req, res, next) => {
 
 // GET /api/health
 router.get('/health', async (req, res, next) => {
-    try {
-        res.send({ status: 'ok' });
-      } catch (error) {
-        next(error);
-      }
+  try {
+    res.send({ message: 'Service is healthy' });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // ROUTER: /api/users
