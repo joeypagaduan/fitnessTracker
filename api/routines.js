@@ -62,8 +62,9 @@ router.patch("/:routineId", requireUser, async (req, res, next) => {
         if (req.user.id !== routine.creatorId) {
             res.status(403).send({
                 error: "Forbidden",
-                message: `User ${req.user.username} is not allowed to update ${routine.name}`,
-                name: "Forbidden",
+                message:
+                    `User ${req.user.username} is not allowed to update ${routine.name}`,
+                name: "Forbidden"
             });
         }
         if (req.user.id === routine.creatorId) {
@@ -76,10 +77,39 @@ router.patch("/:routineId", requireUser, async (req, res, next) => {
         res.send(updatedRoutine);
         }
     } catch (error) {
-      next(error);
+      next (error);
     }
 });
+
 // DELETE /api/routines/:routineId
+router.delete("/:routineId", requireUser, async (req, res, next) => {
+    
+    const { routineId } = req.params;
+    const routine = await getRoutineById(req.params.routineId);
+    const { creatorId, goal, id, isPublic, name } = routine;
+
+    try{
+        if (req.user.id === routine.creatorId) {
+            await destroyRoutine(routineId);
+            res.send({
+                creatorId,
+                goal,
+                id,
+                isPublic,
+                name
+            });
+        } else {
+            res.status(403).send({
+                error: "Forbidden",
+                message:
+                    `User ${req.user.username} is not allowed to delete ${routine.name}`,
+                name: "Forbidden"
+            });
+        }
+    } catch (error) {
+        res.status(403).send(error);
+    } 
+});
 
 // POST /api/routines/:routineId/activities
 
