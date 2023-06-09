@@ -20,9 +20,12 @@ router.get('/:activityId/routines', async (req, res, next) => {
     try {
       const { activityId } = req.params;
       
+    
+
       // Check if the activity exists
       const existingActivity = await getActivityById(activityId);
       if (!existingActivity) {
+        console.log (activityId)
         return next({
           error: "ActivityNotFoundError",
           message: "Activity 10000 not found",
@@ -32,6 +35,7 @@ router.get('/:activityId/routines', async (req, res, next) => {
       
       // Get the public routines that feature the activity
       const publicRoutines = await getPublicRoutinesByActivity(activityId);
+
       
       res.send(publicRoutines);
     } catch (error) {

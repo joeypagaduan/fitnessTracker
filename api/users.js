@@ -136,9 +136,10 @@ router.get("/:username/routines", async (req, res, next) => {
     const publicroutines = await getPublicRoutinesByUser({username});
     const allroutines = await getAllRoutinesByUser({username});
 
+    if(req.user?.username == username){
+      res.send(allroutines)
+    } 
   
-    // res.send({ publicroutines, allroutines });
-    // can not send multiple request? 
     res.send(publicroutines)
     
 
