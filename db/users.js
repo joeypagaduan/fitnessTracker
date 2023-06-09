@@ -27,7 +27,7 @@ async function createUser({ username, password }) {
   } catch (error) {
     throw error;
   }
-};
+}
 
 async function getUser({ username, password }) {
   const user = await getUserByUsername(username);
@@ -71,9 +71,8 @@ async function getUserByUsername(username) {
       WHERE username=$1;
     `, [username]);
 
-console.log(username)
-
     return user;
+
   } catch (error) {
     throw error;
   }

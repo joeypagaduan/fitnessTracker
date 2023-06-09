@@ -20,30 +20,27 @@ const { requireUser } = require("./requireUser");
 router.patch('/:routineActivityId', requireUser, async (req, res, next) => {
     try {
       const { routineActivityId } = req.params;
-      const { routineId } = req.params;
       const { count, duration } = req.body;
+      const existingRoutineActivity = await getRoutineActivityById(routineActivityId);
+      const { routineId } = existingRoutineActivity;
 
       const routine = await getRoutineById(routineId);    
-  
-    const existingRoutineActivity = await getRoutineActivityById(routineActivityId);
    
-console.log(existingRoutineActivity.name)
-    
+      // console.log(existingRoutineActivity.name)
 
          // Check if the authenticated user is the owner of the routine
+         // Update the routine activity
          
-         if (existingRoutineActivity.creatorId !== req.user.id) {
-      return next({
-        error: "UnauthorizedError",
-        message: `User ${req.user.username} is not allowed to update ${routine.name}`,
-        name: "UnauthorizedError",
-      });
-    }
-    
-      // Update the routine activity
-      const updatedRoutineActivity = await updateRoutineActivity(routineActivityId, { count, duration });
-    
-      res.send(updatedRoutineActivity);
+         if (routine.creatorId === req.user.id) {
+           const updatedRoutineActivity = await updateRoutineActivity({id: routineActivityId, count, duration });
+           res.send(updatedRoutineActivity);
+         } else {
+          res.send({
+            error: "UnauthorizedError",
+            message: `User ${req.user.username} is not allowed to update ${routine.name}`,
+            name: "UnauthorizedError"
+          })
+         }
     } catch (error) {
       next(error);
     }
