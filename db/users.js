@@ -54,9 +54,9 @@ async function getUserById(userId) {
     if (!user) {
       return null
     }
-    const { password, ...userData } = user;
+    // const { password, ...userData } = user;
 
-    return userData;
+    return user;
 
   } catch (error) {
     throw error;
@@ -77,7 +77,7 @@ console.log(username)
   } catch (error) {
     throw error;
   }
-};
+}
 
 
 module.exports = {
