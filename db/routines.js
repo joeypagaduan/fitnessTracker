@@ -147,7 +147,7 @@ async function getPublicRoutinesByActivity({ id }) {
 
       const idActivityPublicRoutines = activityPublicRoutines.filter(obj=> {
         return obj.activities.some(activity => {
-          return activity.id === id
+          return activity.id == id
         })
       })
 

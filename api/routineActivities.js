@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require("jsonwebtoken");
-const {JWT_SECRET } = process.env;
+// const jwt = require("jsonwebtoken");
+// const {JWT_SECRET } = process.env;
 
 const{
     getRoutineActivityById, 
@@ -20,59 +20,52 @@ const { requireUser } = require("./requireUser");
 router.patch('/:routineActivityId', requireUser, async (req, res, next) => {
     try {
       const { routineActivityId } = req.params;
-      const { routineId } = req.params;
       const { count, duration } = req.body;
+      const existingRoutineActivity = await getRoutineActivityById(routineActivityId);
+      const { routineId } = existingRoutineActivity;
 
       const routine = await getRoutineById(routineId);    
-  
-    const existingRoutineActivity = await getRoutineActivityById(routineActivityId);
    
-    console.log(existingRoutineActivity.name)
-    
+      // console.log(existingRoutineActivity.name)
 
          // Check if the authenticated user is the owner of the routine
+         // Update the routine activity
          
-         if (existingRoutineActivity.creatorId !== req.user.id) {
-      return next({
-        error: "UnauthorizedError",
-        message: `User ${req.user.username} is not allowed to update ${routine.name}`,
-        name: "UnauthorizedError",
-      });
-    }
-    
-      // Update the routine activity
-      existingRoutineActivity.count = count;
-      existingRoutineActivity.duration = duration;
-      const updatedRoutineActivity = await updateRoutineActivity(routineActivityId, { count, duration });
-    
-      res.send(updatedRoutineActivity);
+         if (routine.creatorId === req.user.id) {
+           const updatedRoutineActivity = await updateRoutineActivity({id: routineActivityId, count, duration });
+           res.send(updatedRoutineActivity);
+         } else {
+          res.status(403).send({
+            error: "UnauthorizedError",
+            message: `User ${req.user.username} is not allowed to update ${routine.name}`,
+            name: "UnauthorizedError"
+          })
+         }
     } catch (error) {
       next(error);
     }
   });
   
-// DELETE /routine_activities/:routineActivityId
-router.delete('/:routineActivityId', async (req, res, next) => {
-  try {
-    const { routineActivityId } = req.params;
-
-    // // Retrieve the routine activity
-    // const routineActivity = await getRoutineActivityById(routineActivityId);
-
-    // // Check if the routine activity exists
-    // if (!routineActivity) {
-    //   return res.status(404).json({ message: 'Routine activity not found' });
-    // }
-
-    // // Check if the authenticated user is the owner of the routine activity
-    // if (routineActivity.creatorId !== req.user.id) {
-    //   return res.status(403).json({ message: 'User is not allowed to delete this routine activity' });
-    // }
-
-    // Delete the routine activity
-    const deletedRoutineActivity = await destroyRoutineActivity(routineActivityId);
-
-    res.send(deletedRoutineActivity);
+  // DELETE /api/routine_activities/:routineActivityId
+  router.delete('/:routineActivityId', requireUser, async (req, res, next) => {
+    try {
+      const { routineActivityId } = req.params;
+      // Check if the routine activity exists
+      const existingRoutineActivity = await getRoutineActivityById(routineActivityId);
+      
+      const routine = await getRoutineById(existingRoutineActivity.routineId);
+      
+      // Delete the routine activity
+      if (routine.creatorId === req.user.id) {
+        const deletedRoutineActivity = await destroyRoutineActivity(routineActivityId);
+        res.send(deletedRoutineActivity);
+      } else {
+        res.status(403).send({
+          error: "UnauthorizedError",
+          message: `User ${req.user.username} is not allowed to delete ${routine.name}`,
+          name: "UnauthorizedError",
+        })
+      }
     } catch (error) {
       next(error);
     }

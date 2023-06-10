@@ -25,7 +25,6 @@ router.get('/:activityId/routines', async (req, res, next) => {
       // Check if the activity exists
       const existingActivity = await getActivityById(activityId);
       if (!existingActivity) {
-        console.log (activityId)
         return next({
           error: "ActivityNotFoundError",
           message: "Activity 10000 not found",
@@ -34,7 +33,7 @@ router.get('/:activityId/routines', async (req, res, next) => {
       }
       
       // Get the public routines that feature the activity
-      const publicRoutines = await getPublicRoutinesByActivity(activityId);
+      const publicRoutines = await getPublicRoutinesByActivity({ id:activityId });
 
       
       res.send(publicRoutines);
@@ -101,19 +100,16 @@ router.patch('/:activityId', async (req, res, next) => {
         }
 
         // Check if the new name already exists for another activity
-    const activityWithSameName = await getActivityByName(name);
-    if (activityWithSameName && activityWithSameName.id !== activityId) {
-      return next({
-        error: "ActivityNameConflictError",
-        message: "An activity with name " + name + " already exists",
-        name: "ActivityNameConflictError",
-      });
-    }
-
-    const updatedActivity = await updateActivity(activityId, { name, description });
-
-    res.send({ name: updatedActivity.name, description: updatedActivity.description });
-    
+        const activityWithSameName = await getActivityByName(name);
+        if (activityWithSameName && activityWithSameName.id !== activityId) {
+        return next({
+            error: "ActivityNameConflictError",
+            message: "An activity with name " + name + " already exists",
+            name: "ActivityNameConflictError",
+        });
+        }
+        const updatedActivity = await updateActivity({id:activityId, name, description });
+        res.send({ name: updatedActivity.name, id:parseInt(activityId), description: updatedActivity.description });
     } catch (error) {
         next(error);
     }

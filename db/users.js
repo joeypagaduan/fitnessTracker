@@ -27,7 +27,7 @@ async function createUser({ username, password }) {
   } catch (error) {
     throw error;
   }
-};
+}
 
 async function getUser({ username, password }) {
   const user = await getUserByUsername(username);
@@ -54,9 +54,9 @@ async function getUserById(userId) {
     if (!user) {
       return null
     }
-    const { password, ...userData } = user;
+    // const { password, ...userData } = user;
 
-    return userData;
+    return user;
 
   } catch (error) {
     throw error;
@@ -71,13 +71,12 @@ async function getUserByUsername(username) {
       WHERE username=$1;
     `, [username]);
 
-console.log(username)
-
     return user;
+
   } catch (error) {
     throw error;
   }
-};
+}
 
 
 module.exports = {
