@@ -39,7 +39,7 @@ describe("DB Users", () => {
   describe("getUserByUsername", () => {
     it("Gets a user based on the username", async () => {
       const fakeUserData = {
-        username: "Sean",
+        username: "Berto",
         password: faker.internet.password(),
       };
       await createUser(fakeUserData);
