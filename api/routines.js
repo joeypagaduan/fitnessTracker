@@ -112,5 +112,26 @@ router.delete("/:routineId", requireUser, async (req, res, next) => {
 });
 
 // POST /api/routines/:routineId/activities
+router.post("/:routineId/activities", async (req, res, next) => {
+    const { routineId } = req.params;
+    const { activityId, count, duration } = req.body;
+
+    try {
+        const addedRoutineActivity = await addActivityToRoutine({
+            routineId,
+            activityId,
+            count,
+            duration,
+        });
+        res.send(addedRoutineActivity);
+    } catch (error) {
+        next ({
+            error: "Forbidden",
+            message: `Activity ID ${activityId} already exists in Routine ID ${routineId}`,
+            name: "Forbidden"
+        });
+    };
+
+});
 
 module.exports = router;

@@ -110,10 +110,10 @@ router.patch('/:activityId', async (req, res, next) => {
       });
     }
 
-        // Update the activity
-        const updatedActivity = await updateActivity(activityId, { name, description });
+    const updatedActivity = await updateActivity(activityId, { name, description });
 
-        res.send({ name: updatedActivity.name, description: updatedActivity.description });
+    res.send({ name: updatedActivity.name, description: updatedActivity.description });
+    
     } catch (error) {
         next(error);
     }
