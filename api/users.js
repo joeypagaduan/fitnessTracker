@@ -132,20 +132,20 @@ router.get("/:username/routines", async (req, res, next) => {
   try {
     const { username } = req.params;
 
-  
-    const publicroutines = await getPublicRoutinesByUser({username});
-    const allroutines = await getAllRoutinesByUser({username});
+    const [publicRoutines, allRoutines] = await Promise.all([
+      getPublicRoutinesByUser({ username }),
+      getAllRoutinesByUser({ username }),
+    ]);
 
-    if(req.user?.username == username){
-      res.send(allroutines)
-    } 
-  
-    res.send(publicroutines)
-    
-
+    if (req.user && req.user.username === username) {
+      res.send(allRoutines);
+    } else {
+      res.send(publicRoutines);
+    }
   } catch (error) {
     next(error);
   }
 });
+
 
 module.exports = router;
